@@ -1,6 +1,7 @@
 package models
 
-const GroupId = 964905273
+
+var GroupId int64
 
 type MessageData struct {
 	SelfID        int64      `json:"self_id"`

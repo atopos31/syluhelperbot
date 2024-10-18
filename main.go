@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,12 +20,15 @@ import (
 
 func main() {
 	uin := os.Getenv("uin")
+	GroupIdstr := os.Getenv("groupid")
+	models.GroupId, _ = strconv.ParseInt(GroupIdstr, 10, 64)
 	wshost := os.Getenv("wshost")
 	webapihost := os.Getenv("webapihost")
 	AK := os.Getenv("AK")
 	maxdbwebapiaddr := os.Getenv("maxdbwebapiaddr")
 	maxdbak := os.Getenv("maxdbak")
 	maxdbappid := os.Getenv("maxdbappid")
+
 	var err error
 	conn := new(websocket.Conn)
 	var webuitoken string
