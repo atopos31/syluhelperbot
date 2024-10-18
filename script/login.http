@@ -1,0 +1,9 @@
+http://192.168.0.105:6099/api/auth/login
+{"token":"tgglqkaesto"}
+{
+    "code": 0,
+    "message": "success",
+    "data": {
+        "Credential": "eyJEYXRhIjp7IkNyZWF0ZWRUaW1lIjoxNzI4NzkxMjY4ODg3LCJUb2tlbkVuY29kZWQiOiJ0Z2dscWthZXN0byJ9LCJIbWFjIjoiMjJlMzg3MGQ4MGZmNGY2YWRmYzA0NzljNDY3MTBlMjc2OGQ3Mzg5NGU5ZjdhYTZlYjM5OWMzM2Y5ZDI4N2MwOSJ9"
+    }
+}
