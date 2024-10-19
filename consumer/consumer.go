@@ -29,11 +29,13 @@ func (c *Consumer) Start() {
 			log.Printf("msg %v", msg)
 			if err := c.SettleAI(msg); err != nil {
 				log.Printf("settle ai failed %v", err)
+				c.Bot.SendErrorMessage(err)
 			}
 		case cmd := <-c.Cmdmsg:
 			log.Printf("cmd %v", cmd)
 			if err := c.SettleCmd(cmd); err != nil {
 				log.Printf("settle cmd failed %v", err)
+				c.Bot.SendErrorMessage(err)
 			}
 		}
 	}
@@ -74,13 +76,7 @@ func (c *Consumer) SettleCmd(cmd models.Cmdmsg) error {
 
 	merchant,err := c.MerchatMgr.GetRandomMerchant()
 	if err != nil {
-		log.Println("get merchant failed",err)
-		return c.Bot.SendGroupMessage(models.GroupId, models.Message{
-			Typ: "text",
-			Data: models.Data{
-				Text: fmt.Sprintf("Error :%v",err),
-			},
-		})
+		return err
 	}
 	if strings.EqualFold(merchant.Said, "") {
 		merchant.Said = "小助手推荐！"

@@ -20,6 +20,7 @@ import (
 
 func main() {
 	uin := os.Getenv("uin")
+	Masterqq := os.Getenv("masterqq")
 	GroupIdstr := os.Getenv("groupid")
 	models.GroupId, _ = strconv.ParseInt(GroupIdstr, 10, 64)
 	wshost := os.Getenv("wshost")
@@ -62,8 +63,9 @@ func main() {
 		break
 	}
 	log.Println("Connect success")
-	bot := botcore.NewBot(conn, uin)
-	bot.SendPrivateMessage(2945294768, models.Message{
+	masterqqint, _ := strconv.ParseInt(Masterqq, 10, 64)
+	bot := botcore.NewBot(conn, uin, masterqqint)
+	bot.SendPrivateMessage(masterqqint, models.Message{
 		Typ: "text",
 		Data: models.Data{
 			Text: "bot 已启动！",

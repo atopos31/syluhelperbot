@@ -3,6 +3,7 @@ package botcore
 import (
 	"bot/models"
 	"encoding/json"
+	"fmt"
 	"net/url"
 
 	"github.com/gorilla/websocket"
@@ -11,12 +12,14 @@ import (
 type Bot struct {
 	wsconn *websocket.Conn
 	Mineqq string
+	Masterqq int64
 }
 
-func NewBot(conn *websocket.Conn,qq string) *Bot {
+func NewBot(conn *websocket.Conn,mineqq string,masterqq int64) *Bot {
 	return &Bot{
 		wsconn: conn,
-		Mineqq: qq,
+		Mineqq: mineqq,
+		Masterqq: masterqq,
 	}
 }
 
@@ -55,5 +58,14 @@ func (bot *Bot) SendGroupMessage(groupid int64, msgs ...models.Message) error {
 	return bot.wsconn.WriteJSON(&models.API{
 		Action: "send_group_msg",
 		Params: msg,
+	})
+}
+
+func (bot *Bot) SendErrorMessage(err error) error {
+	return bot.SendPrivateMessage(bot.Masterqq, models.Message{
+		Typ: "text",
+		Data: models.Data{
+			Text: fmt.Sprintf("Error :%v", err),
+		},
 	})
 }
