@@ -3,7 +3,7 @@ package cron
 import (
 	"bot/models"
 	"encoding/json"
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -23,17 +23,15 @@ func UpdateMerchantList(mgr *MerchantMgr) {
 	ticker := time.NewTicker(time.Second * 2)
 	merchants, err := getMerchantList(client)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("获取商家列表失败")
-		return
+		log.Println("获取商家列表失败", err)
+	} else {
+		mgr.Update(merchants)
 	}
-	fmt.Println(merchants)
-	mgr.Update(merchants)
 	for range ticker.C {
 		merchants, err := getMerchantList(client)
 		if err != nil {
-			fmt.Println("获取商家列表失败")
-			return
+			log.Println("获取商家列表失败", err)
+			continue
 		}
 		mgr.Update(merchants)
 	}

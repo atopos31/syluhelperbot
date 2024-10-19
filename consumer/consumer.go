@@ -72,7 +72,16 @@ func (c *Consumer) SettleCmd(cmd models.Cmdmsg) error {
 		return nil
 	}
 
-	merchant := c.MerchatMgr.GetRandomMerchant()
+	merchant,err := c.MerchatMgr.GetRandomMerchant()
+	if err != nil {
+		log.Println("get merchant failed",err)
+		return c.Bot.SendGroupMessage(models.GroupId, models.Message{
+			Typ: "text",
+			Data: models.Data{
+				Text: fmt.Sprintf("Error :%v",err),
+			},
+		})
+	}
 	if strings.EqualFold(merchant.Said, "") {
 		merchant.Said = "小助手推荐！"
 	}
