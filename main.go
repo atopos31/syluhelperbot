@@ -50,10 +50,12 @@ func main() {
 			}
 
 			if trystart > 20 {
+				trystart = 0
 				restartNCcmd := exec.Command("docker", "restart", "napcat")
 				_, err = restartNCcmd.CombinedOutput()
-				log.Println("Restart nc failed:", err)
-				return
+				if err != nil {
+					log.Println("Restart nc failed:", err)
+				}
 			}
 			continue
 		}
