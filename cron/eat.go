@@ -20,12 +20,13 @@ type res struct {
 func UpdateMerchantList(mgr *MerchantMgr) {
 	client := resty.New()
 	// 定时任务
-	ticker := time.NewTicker(time.Second * 2)
+	ticker := time.NewTicker(time.Second * 120)
 	merchants, err := getMerchantList(client)
 	if err != nil {
 		log.Println("获取商家列表失败", err)
 	} else {
 		mgr.Update(merchants)
+		log.Printf("更新商家列表成功：数据数%d\n", len(merchants))
 	}
 	for range ticker.C {
 		merchants, err := getMerchantList(client)
@@ -34,6 +35,7 @@ func UpdateMerchantList(mgr *MerchantMgr) {
 			continue
 		}
 		mgr.Update(merchants)
+		log.Printf("更新商家列表成功：数据数%d\n", len(merchants))
 	}
 }
 

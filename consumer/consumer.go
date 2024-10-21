@@ -4,6 +4,7 @@ import (
 	"bot/botcore"
 	"bot/cron"
 	"bot/models"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -71,7 +72,7 @@ func (c *Consumer) SettleAI(msg models.Chanmsg) error {
 
 func (c *Consumer) SettleCmd(cmd models.Cmdmsg) error {
 	if !strings.Contains(cmd.Cmd, "今天吃什么") {
-		return nil
+		return errors.New(fmt.Sprintf("cmd: %s not support",cmd))
 	}
 
 	merchant,err := c.MerchatMgr.GetRandomMerchant()
