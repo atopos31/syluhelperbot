@@ -53,7 +53,7 @@ func (l *Listener) Handler(msg *models.MessageData) {
 			Cmd: text,
 		}
 		l.Cmdmsgchan <- cmdmsg
-	} else if strings.EqualFold(qq, atqq) {
+	} else if strings.EqualFold(l.Bot.Mineqq, atqq) {
 		chanmsg := models.Chanmsg{
 			QQ:   qq,
 			Text: text,
