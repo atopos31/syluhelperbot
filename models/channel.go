@@ -6,6 +6,5 @@ type Chanmsg struct {
 }
 
 type Cmdmsg struct {
-	QQ  string
 	Cmd string
 }

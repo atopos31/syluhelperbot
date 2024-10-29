@@ -9,7 +9,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-type res struct {
+type reseat struct {
 	Code int    `json:"code"`
 	Msg  string `json:"msg"`
 	Data struct {
@@ -47,7 +47,7 @@ func getMerchantList(client *resty.Client) ([]models.Merchant, error) {
 	if err != nil {
 		return nil, err
 	}
-	resstruct := new(res)
+	resstruct := new(reseat)
 	if err = json.Unmarshal(resp.Body(), resstruct); err != nil {
 		return nil, err
 	}

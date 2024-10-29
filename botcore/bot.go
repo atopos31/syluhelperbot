@@ -4,6 +4,7 @@ import (
 	"bot/models"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 
 	"github.com/gorilla/websocket"
@@ -36,6 +37,7 @@ func (bot *Bot) ReadMessage() (*models.MessageData, error) {
 	}
 
 	var msg models.MessageData
+	log.Println(string(rawmsg))
 	return &msg, json.Unmarshal(rawmsg, &msg) // json转换可能会失败
 }
 
@@ -44,7 +46,7 @@ func (bot *Bot) SendPrivateMessage(qq int64, msgs ...models.Message) error {
 		UserID:  qq,
 		Message: msgs,
 	}
-	return bot.wsconn.WriteJSON(&models.API{
+	return bot.wsconn.WriteJSON(&models.API{ 
 		Action: "send_private_msg",
 		Params: msg,
 	})

@@ -16,11 +16,12 @@ type Consumer struct {
 	Ai         *AI
 	Sess       *chatSession
 	MerchatMgr *cron.MerchantMgr
+	RaceMgr    *cron.RaceMgr
 	Bot        *botcore.Bot
 }
 
-func NewConsumer(aimsg chan models.Chanmsg, cmdmsg chan models.Cmdmsg, ai *AI, sess *chatSession, mgr *cron.MerchantMgr, bot *botcore.Bot) *Consumer {
-	return &Consumer{ToAIMsg: aimsg, Cmdmsg: cmdmsg, Ai: ai, Sess: sess, MerchatMgr: mgr, Bot: bot}
+func NewConsumer(aimsg chan models.Chanmsg, cmdmsg chan models.Cmdmsg, ai *AI, sess *chatSession, mgr *cron.MerchantMgr,raceMgr *cron.RaceMgr, bot *botcore.Bot) *Consumer {
+	return &Consumer{ToAIMsg: aimsg, Cmdmsg: cmdmsg, Ai: ai, Sess: sess, MerchatMgr: mgr,RaceMgr: raceMgr, Bot: bot}
 }
 
 func (c *Consumer) Start() {
@@ -71,11 +72,35 @@ func (c *Consumer) SettleAI(msg models.Chanmsg) error {
 }
 
 func (c *Consumer) SettleCmd(cmd models.Cmdmsg) error {
-	if !strings.Contains(cmd.Cmd, "今天吃什么") {
-		return errors.New(fmt.Sprintf("cmd: %s not support",cmd))
+	switch {
+		case strings.Contains(cmd.Cmd, "help"):
+			return c.cmdHelp()
+		case strings.Contains(cmd.Cmd, "今天吃什么"):
+			return c.cmdEat()
+		case strings.Contains(cmd.Cmd, "近期比赛"):
+			return c.cmdRaces()
+		default:
+			return errors.New("cmd not found")
 	}
+}
 
-	merchant,err := c.MerchatMgr.GetRandomMerchant()
+func (c *Consumer) cmdHelp() error {
+	return c.Bot.SendGroupMessage(models.GroupId,
+		models.Message{
+		Typ: "text",
+		Data: models.Data{
+			Text: "/今天吃什么：随机推荐食堂商家\n",
+		},
+	},models.Message{
+		Typ: "text",
+		Data: models.Data{
+			Text: "/近期比赛：查询近期竞赛",
+		},
+	})
+}
+
+func (c *Consumer) cmdEat() error {
+	merchant, err := c.MerchatMgr.GetRandomMerchant()
 	if err != nil {
 		return err
 	}
@@ -96,7 +121,23 @@ func (c *Consumer) SettleCmd(cmd models.Cmdmsg) error {
 		}, models.Message{
 			Typ: "text",
 			Data: models.Data{
-				Text: fmt.Sprintf("评分：%f 状态：%s", merchant.Score,merchant.GetStatus()),
+				Text: fmt.Sprintf("评分：%f 状态：%s", merchant.Score, merchant.GetStatus()),
 			},
 		})
+}
+
+func (c *Consumer) cmdRaces() error {
+	c.RaceMgr.Mu.Lock()
+	defer c.RaceMgr.Mu.Unlock()
+	msgs := make([]models.Message,0)
+	for _,race := range c.RaceMgr.Races {
+		msgs = append(msgs,models.Message{
+			Typ: "text",
+			Data: models.Data{
+				Text: fmt.Sprintf("%s\n%s\n",race.Name,race.URL),
+			},
+		})
+	}
+	msgs[len(msgs)-1].Data.Text = strings.TrimSuffix(msgs[len(msgs)-1].Data.Text,"\n")
+	return c.Bot.SendGroupMessage(models.GroupId,msgs...)
 }

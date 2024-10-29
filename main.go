@@ -83,7 +83,11 @@ func main() {
 	merchhantMgr := cron.NewMerchantMgr()
 	go cron.UpdateMerchantList(merchhantMgr)
 
+	//  races 服务
+	raceMgr := cron.NewRaceMgr(bot)
+	go raceMgr.Start()
+
 	// 消费者
-	Consumer := consumer.NewConsumer(aimsgchan, cmdmsgchan, ai, sess, merchhantMgr, bot)
+	Consumer := consumer.NewConsumer(aimsgchan, cmdmsgchan, ai, sess, merchhantMgr,raceMgr, bot)
 	Consumer.Start()
 }

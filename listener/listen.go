@@ -32,11 +32,10 @@ func (l *Listener) Listen() {
 }
 
 func (l *Listener) Handler(msg *models.MessageData) {
-	if msg.MessageType != "group" || msg.GroupID != models.GroupId || len(msg.Message) != 2 {
+	if msg.MessageType != "group" || msg.GroupID != models.GroupId {
 		return
 	}
 	var atqq string
-	var qq string
 	var text string
 	for data := range msg.Message {
 		if msg.Message[data].Typ == "at" {
@@ -46,20 +45,15 @@ func (l *Listener) Handler(msg *models.MessageData) {
 		}
 	}
 
-	if text == "" || atqq != "3808139675" {
-		return
-	}
-
-	qq = strconv.FormatInt(msg.UserID, 10)
+	qq := strconv.FormatInt(msg.UserID, 10)
 	log.Println("QQ:", msg.UserID, "Text:", text)
 
 	if strings.Contains(text, "/") {
 		cmdmsg := models.Cmdmsg{
 			Cmd: text,
-			QQ:  qq,
 		}
 		l.Cmdmsgchan <- cmdmsg
-	} else {
+	} else if strings.EqualFold(qq, atqq) {
 		chanmsg := models.Chanmsg{
 			QQ:   qq,
 			Text: text,
