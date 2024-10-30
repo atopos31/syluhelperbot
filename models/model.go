@@ -1,6 +1,5 @@
 package models
 
-
 var GroupId int64
 
 type MessageData struct {

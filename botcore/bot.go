@@ -11,15 +11,15 @@ import (
 )
 
 type Bot struct {
-	wsconn *websocket.Conn
-	Mineqq string
+	wsconn   *websocket.Conn
+	Mineqq   string
 	Masterqq int64
 }
 
-func NewBot(conn *websocket.Conn,mineqq string,masterqq int64) *Bot {
+func NewBot(conn *websocket.Conn, mineqq string, masterqq int64) *Bot {
 	return &Bot{
-		wsconn: conn,
-		Mineqq: mineqq,
+		wsconn:   conn,
+		Mineqq:   mineqq,
 		Masterqq: masterqq,
 	}
 }
@@ -46,7 +46,7 @@ func (bot *Bot) SendPrivateMessage(qq int64, msgs ...models.Message) error {
 		UserID:  qq,
 		Message: msgs,
 	}
-	return bot.wsconn.WriteJSON(&models.API{ 
+	return bot.wsconn.WriteJSON(&models.API{
 		Action: "send_private_msg",
 		Params: msg,
 	})

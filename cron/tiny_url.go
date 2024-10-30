@@ -15,11 +15,11 @@ type res struct {
 	Msg  string `json:"message"`
 }
 
-func GenTinyURL(URL string) (string,error) {
+func GenTinyURL(URL string) (string, error) {
 	client := resty.New()
 	resp, err := client.R().
-			SetBody(map[string]any{"url": URL,"time": 7}).
-		Post(TinyURLAPI+"/create")
+		SetBody(map[string]any{"url": URL, "time": 7}).
+		Post(TinyURLAPI + "/create")
 	if err != nil {
 		return "", err
 	}
@@ -28,6 +28,6 @@ func GenTinyURL(URL string) (string,error) {
 	if err = json.Unmarshal(resp.Body(), resstruct); err != nil {
 		return "", err
 	}
-	log.Printf("tinyurl: %s",resstruct.Data)
+	log.Printf("tinyurl: %s", resstruct.Data)
 	return resstruct.Data, nil
 }

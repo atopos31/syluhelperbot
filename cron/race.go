@@ -3,6 +3,7 @@ package cron
 import (
 	"bot/botcore"
 	"bot/models"
+	"bot/util"
 	"encoding/json"
 	"log"
 	"strings"
@@ -23,7 +24,7 @@ type resRace struct {
 }
 
 type RaceMgr struct {
-	Mu           sync.Mutex
+	Mu    sync.Mutex
 	Bot   *botcore.Bot
 	Races map[string]Race
 }
@@ -33,55 +34,43 @@ type Race struct {
 	CoverPhoto string `json:"coverPhoto"`
 	ID         string `json:"id"`
 	EndTime    string `json:"endTime"`
+	StartTime  string `json:"startTime"`
 	URL        string
 }
 
 func NewRaceMgr(bot *botcore.Bot) *RaceMgr {
-	return &RaceMgr{Bot: bot,Races: map[string]Race{}}
+	return &RaceMgr{Bot: bot, Races: map[string]Race{}}
 }
 
 func (r *RaceMgr) Start() {
 	client := resty.New()
+GET:
 	races, err := r.getNewRaces(client)
 	if err != nil {
-		log.Println(err)
-		return
+		r.Bot.SendErrorMessage(err)
+		time.Sleep(time.Second * 60)
+		goto GET
 	}
 
 	for _, race := range races {
 		race.URL, err = GenTinyURL("https://cxcy.upln.cn/match/details?comId=" + race.ID)
 		if err != nil {
 			r.Bot.SendErrorMessage(err)
+			continue
 		}
-		log.Println(race.URL)
+		ok, err := util.IsToday(race.StartTime)
+		if err != nil {
+			r.Bot.SendErrorMessage(err)
+		}
+		if ok {
+			r.SendNewRace(race)
+		}
 		r.Mu.Lock()
 		r.Races[race.ID] = race
 		r.Mu.Unlock()
 	}
 	log.Println("race success:")
 	log.Println(r.Races)
-	t := time.NewTicker(time.Hour)
-	for range t.C {
-		races, err := r.getNewRaces(client)
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-		for _, race := range races {
-			race.URL, err = GenTinyURL("https://cxcy.upln.cn/match/details?comId=" + race.ID)
-			if err != nil {
-				r.Bot.SendErrorMessage(err)
-			}
-			r.Mu.Lock()
-			if _, ok := r.Races[race.ID]; !ok {
-				if err:=r.SendNewRace(race); err!=nil {
-					r.Bot.SendErrorMessage(err)
-				}
-			}
-			r.Races[race.ID] = race
-			r.Mu.Unlock()
-		}
-	}
 }
 
 func (r *RaceMgr) SendNewRace(race Race) error {
@@ -139,4 +128,3 @@ func (r *RaceMgr) getNewRaces(client *resty.Client) ([]Race, error) {
 	}
 	return ress.Result.Races, nil
 }
-

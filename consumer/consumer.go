@@ -20,8 +20,8 @@ type Consumer struct {
 	Bot        *botcore.Bot
 }
 
-func NewConsumer(aimsg chan models.Chanmsg, cmdmsg chan models.Cmdmsg, ai *AI, sess *chatSession, mgr *cron.MerchantMgr,raceMgr *cron.RaceMgr, bot *botcore.Bot) *Consumer {
-	return &Consumer{ToAIMsg: aimsg, Cmdmsg: cmdmsg, Ai: ai, Sess: sess, MerchatMgr: mgr,RaceMgr: raceMgr, Bot: bot}
+func NewConsumer(aimsg chan models.Chanmsg, cmdmsg chan models.Cmdmsg, ai *AI, sess *chatSession, mgr *cron.MerchantMgr, raceMgr *cron.RaceMgr, bot *botcore.Bot) *Consumer {
+	return &Consumer{ToAIMsg: aimsg, Cmdmsg: cmdmsg, Ai: ai, Sess: sess, MerchatMgr: mgr, RaceMgr: raceMgr, Bot: bot}
 }
 
 func (c *Consumer) Start() {
@@ -73,30 +73,30 @@ func (c *Consumer) SettleAI(msg models.Chanmsg) error {
 
 func (c *Consumer) SettleCmd(cmd models.Cmdmsg) error {
 	switch {
-		case strings.Contains(cmd.Cmd, "help"):
-			return c.cmdHelp()
-		case strings.Contains(cmd.Cmd, "今天吃什么"):
-			return c.cmdEat()
-		case strings.Contains(cmd.Cmd, "近期比赛"):
-			return c.cmdRaces()
-		default:
-			return errors.New("cmd not found")
+	case strings.Contains(cmd.Cmd, "help"):
+		return c.cmdHelp()
+	case strings.Contains(cmd.Cmd, "今天吃什么"):
+		return c.cmdEat()
+	case strings.Contains(cmd.Cmd, "近期比赛"):
+		return c.cmdRaces()
+	default:
+		return errors.New("cmd not found")
 	}
 }
 
 func (c *Consumer) cmdHelp() error {
 	return c.Bot.SendGroupMessage(models.GroupId,
 		models.Message{
-		Typ: "text",
-		Data: models.Data{
-			Text: "/今天吃什么：随机推荐食堂商家\n",
-		},
-	},models.Message{
-		Typ: "text",
-		Data: models.Data{
-			Text: "/近期比赛：查询近期竞赛",
-		},
-	})
+			Typ: "text",
+			Data: models.Data{
+				Text: "/今天吃什么：随机推荐食堂商家\n",
+			},
+		}, models.Message{
+			Typ: "text",
+			Data: models.Data{
+				Text: "/近期比赛：查询近期竞赛",
+			},
+		})
 }
 
 func (c *Consumer) cmdEat() error {
@@ -129,15 +129,15 @@ func (c *Consumer) cmdEat() error {
 func (c *Consumer) cmdRaces() error {
 	c.RaceMgr.Mu.Lock()
 	defer c.RaceMgr.Mu.Unlock()
-	msgs := make([]models.Message,0)
-	for _,race := range c.RaceMgr.Races {
-		msgs = append(msgs,models.Message{
+	msgs := make([]models.Message, 0)
+	for _, race := range c.RaceMgr.Races {
+		msgs = append(msgs, models.Message{
 			Typ: "text",
 			Data: models.Data{
-				Text: fmt.Sprintf("%s\n%s\n",race.Name,race.URL),
+				Text: fmt.Sprintf("%s\n%s\n", race.Name, race.URL),
 			},
 		})
 	}
-	msgs[len(msgs)-1].Data.Text = strings.TrimSuffix(msgs[len(msgs)-1].Data.Text,"\n")
-	return c.Bot.SendGroupMessage(models.GroupId,msgs...)
+	msgs[len(msgs)-1].Data.Text = strings.TrimSuffix(msgs[len(msgs)-1].Data.Text, "\n")
+	return c.Bot.SendGroupMessage(models.GroupId, msgs...)
 }

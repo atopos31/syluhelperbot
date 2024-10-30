@@ -22,14 +22,14 @@ func NewMerchantMgr() *MerchantMgr {
 }
 
 // 随机获取一个
-func (m *MerchantMgr) GetRandomMerchant() (*models.Merchant,error) {
+func (m *MerchantMgr) GetRandomMerchant() (*models.Merchant, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	num := len(m.MerchantList)
 	if num == 0 {
 		return nil, errors.New("empty merchant list")
 	}
-	return &m.MerchantList[rand.Intn(num)],nil
+	return &m.MerchantList[rand.Intn(num)], nil
 }
 
 func (m *MerchantMgr) Update(merchant []models.Merchant) {

@@ -88,6 +88,6 @@ func main() {
 	go raceMgr.Start()
 
 	// 消费者
-	Consumer := consumer.NewConsumer(aimsgchan, cmdmsgchan, ai, sess, merchhantMgr,raceMgr, bot)
+	Consumer := consumer.NewConsumer(aimsgchan, cmdmsgchan, ai, sess, merchhantMgr, raceMgr, bot)
 	Consumer.Start()
 }

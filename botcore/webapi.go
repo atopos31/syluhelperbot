@@ -20,7 +20,7 @@ type res struct {
 func SetQuickLogin(host, credential, uin string) error {
 	client := resty.New()
 	url := fmt.Sprintf("http://%s%s", host, "/api/QQLogin/SetQuickLogin")
-	resp, err := client.SetTimeout(3*time.Second).R().SetAuthToken(credential).SetBody(map[string]string{"uin": uin}).Post(url)
+	resp, err := client.SetTimeout(3 * time.Second).R().SetAuthToken(credential).SetBody(map[string]string{"uin": uin}).Post(url)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func CheckLoginStatus(host, credential string) (bool, error) {
 func GetWebUIToken(host, ak string) (string, error) {
 	client := resty.New()
 	url := fmt.Sprintf("http://%s%s", host, "/api/auth/login")
-	resp, err := client.SetTimeout(3*time.Second).R().SetBody(map[string]string{"token": ak}).Post(url)
+	resp, err := client.SetTimeout(3 * time.Second).R().SetBody(map[string]string{"token": ak}).Post(url)
 	if err != nil {
 		return "", err
 	}
